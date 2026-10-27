@@ -1,23 +1,25 @@
-# Linux AutoSetup — Void Linux + XFCE
+# Setup Void Linux — i3 Nord ou XFCE
 
-Instalador pós-instalação experimental para Void Linux (preferencialmente glibc). Não formata discos nem modifica bootloader.
+Instalador experimental para Void Linux, sem particionamento, alterações de bootloader ou reboot. **Padrão: i3**. Não testado em máquina Void real.
 
-## Executar
+## Uso
 
 ```bash
-bash bootstrap.sh --plan
-bash bootstrap.sh --apply
+bash bootstrap.sh --plan --desktop=i3
+bash bootstrap.sh --apply --desktop=i3
 ```
 
-O modo `--plan` apresenta pacotes e estado de serviços sem alterações. O modo `--apply` pede confirmação, instala Xorg, XFCE, LightDM, rede, áudio e ferramentas, e cria links runit de `dbus`, `elogind` e `NetworkManager` quando não encontra conflitos. O script **não desativa** gerenciadores de rede existentes. `LightDM` permanece desabilitado até validação manual.
+Para XFCE, substitua por `--desktop=xfce`. `--plan` não modifica arquivos. `--apply` exige sudo e confirmação `APLICAR`.
 
-## Falhas e segurança
+O perfil i3 instala Xorg, i3, Polybar, Rofi, Dunst, Alacritty, feh, xinit e Thunar; aplica os arquivos Nord em `config/` por symlinks, preservando configurações existentes. Se `~/.xinitrc` não existir, cria `exec dbus-run-session i3`. Inicie manualmente com `startx`. O tema é escuro, sem compositor e sem animações. O papel de parede ainda precisa ser configurado pelo usuário.
 
-Em caso de falha, o script interrompe as etapas seguintes e registra o erro em `~/.local/state/linux-autosetup/`. Pacotes e links já aplicados **não são revertidos automaticamente**. Antes de reexecutar, examine o log. A execução preserva symlinks existentes e bloqueia links conflitantes. Não executa alterações de kernel nem instala drivers proprietários por detecção automática.
+O perfil XFCE instala XFCE e LightDM, mas não habilita LightDM automaticamente. Ambos instalam componentes básicos de rede e áudio. O script cria symlinks runit para dbus, elogind e NetworkManager **apenas** se não detectar serviços concorrentes; não desativa rede existente.
 
-**Ainda não testado em Void real.** Confirme os nomes dos pacotes e compatibilidade da versão instalada. Não publique logs sem remover informações sensíveis.
+## Limitações
 
-## Documentação oficial
+O script ainda não implementa zram, drivers específicos de hardware, rollback ou migração automática entre gerenciadores de rede. Se ocorrer erro após instalar pacotes, alterações anteriores permanecem. Logs em `~/.local/state/linux-autosetup/`; revise dados sensíveis antes de compartilhar.
+
+## Referências
 - https://docs.voidlinux.org/config/services/index.html
 - https://docs.voidlinux.org/config/network/networkmanager.html
 - https://docs.voidlinux.org/config/graphical-session/xorg.html
