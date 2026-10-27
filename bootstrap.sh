@@ -37,14 +37,32 @@ if [[ "$DESKTOP" == i3 ]]; then bash "$(dirname "$0")/scripts/configure-desktop.
 command -v sudo >/dev/null || { echo "sudo ausente"; exit 2; }
 read -r -p "Digite APLICAR para instalar $DESKTOP: " answer
 [[ "$answer" == APLICAR ]] || { echo "Cancelado"; exit 0; }
-sudo xbps-install -Sy "${packages[@]}"
+echo "[INFO] Atualizando índices XBPS"
+sudo xbps-install -S
+missing=()
+for pkg in "${packages[@]}"; do
+ if xbps-query -p pkgver "$pkg" >/dev/null 2>&1; then
+  echo "[OK] Já instalado: $pkg"
+ else
+  missing+=("$pkg")
+ fi
+done
+if (("${#missing[@]}" > 0)); then
+ echo "[INFO] Instalando pacotes ausentes: ${missing[*]}"
+ sudo xbps-install -y "${missing[@]}"
+else
+ echo "[OK] Todos os pacotes já estão instalados"
+fi
+network_conflict=0
 for s in dhcpcd wpa_supplicant wicd acpid; do
  if [[ -e /var/service/$s || -L /var/service/$s ]]; then
-  echo "[BLOQUEIO] $s habilitado; preserve sua rede. Nenhum symlink runit novo será criado."
-  exit 4
+  echo "[AVISO] $s habilitado; preservando a rede. Configuração do desktop continuará sem ativar NetworkManager."
+  network_conflict=1
  fi
 done
 for s in dbus elogind NetworkManager; do
+ if [[ "$s" == NetworkManager && "$network_conflict" == 1 ]]; then echo "[AVISO] NetworkManager não ativado"; continue; fi
+ if [[ "$s" == elogind && -L /var/service/acpid ]]; then echo "[AVISO] elogind não ativado com acpid"; continue; fi
  [[ -d /etc/sv/$s ]] || { echo "Serviço ausente: $s"; exit 5; }
  if [[ -L /var/service/$s ]]; then
   [[ "$(readlink -f /var/service/$s)" == "$(readlink -f /etc/sv/$s)" ]] || { echo "Link conflitante: $s"; exit 6; }
@@ -65,5 +83,5 @@ if [[ "$DESKTOP" == i3 ]]; then
   echo "Criado ~/.xinitrc"
  else echo "Preservado ~/.xinitrc; configure startx manualmente se necessário"; fi
 fi
-for s in dbus elogind NetworkManager; do sudo sv status "$s" || true; done
+for s in dbus elogind NetworkManager; do [[ -L /var/service/$s ]] && sudo sv status "$s" || true; done
 echo "[OK] Concluído. i3: execute startx no TTY; XFCE: LightDM permanece desabilitado até validação."
