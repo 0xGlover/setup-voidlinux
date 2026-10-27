@@ -20,7 +20,7 @@ exec > >(tee -a "$LOG") 2>&1
 trap 'rc=$?; echo "[ERRO] Linha $LINENO; status $rc; log $LOG"; exit "$rc"' ERR
 common=(xorg dbus elogind polkit NetworkManager network-manager-applet pipewire wireplumber alsa-utils pavucontrol git curl pciutils usbutils)
 if [[ "$DESKTOP" == i3 ]]; then
- desktop_packages=(i3 i3status polybar rofi dunst alacritty feh xinit thunar)
+ desktop_packages=(i3 i3status polybar rofi dunst alacritty feh xinit Thunar)
 else
  desktop_packages=(xfce4 xfce4-terminal lightdm lightdm-gtk3-greeter)
 fi
