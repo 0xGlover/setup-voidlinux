@@ -1,0 +1,14 @@
+configuration {
+  modi: "drun,run,window";
+  show-icons: true;
+  font: "monospace 11";
+}
+* {
+  background: #2e3440;
+  foreground: #eceff4;
+  selected-normal-background: #5e81ac;
+  selected-normal-foreground: #eceff4;
+}
+window { width: 40%; border: 2px; border-color: #88c0d0; }
+listview { lines: 8; }
+element { padding: 8px; }
