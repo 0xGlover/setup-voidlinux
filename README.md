@@ -1,16 +1,24 @@
-# Linux AutoSetup — Void Linux + XFCE (protótipo seguro)
+# Linux AutoSetup — Void Linux + XFCE
 
-Implementação inicial para **Void glibc**. Não formata discos, não modifica bootloader, não habilita serviços e não reinicia automaticamente. Requer conexão de rede para instalar pacotes.
+Instalador pós-instalação experimental para Void Linux (preferencialmente glibc). Não formata discos nem modifica bootloader.
 
-## Rodar
+## Executar
 
 ```bash
 bash bootstrap.sh --plan
 bash bootstrap.sh --apply
 ```
 
-O modo `--plan` não instala pacotes. O modo `--apply` pede confirmação explícita, valida a existência dos pacotes no índice XBPS e solicita privilégios via sudo. Ambos salvam logs em `~/.local/state/linux-autosetup/`.
+O modo `--plan` apresenta pacotes e estado de serviços sem alterações. O modo `--apply` pede confirmação, instala Xorg, XFCE, LightDM, rede, áudio e ferramentas, e cria links runit de `dbus`, `elogind` e `NetworkManager` quando não encontra conflitos. O script **não desativa** gerenciadores de rede existentes. `LightDM` permanece desabilitado até validação manual.
 
-**Limitações:** a auditoria de hardware é informativa. Este script ainda **não** escolhe drivers especializados nem otimiza a máquina automaticamente. Os nomes/disponibilidade dos pacotes devem ser verificados na versão atual do Void. Em falhas o Bash interrompe etapas posteriores, mas o XBPS pode ter instalado parte dos pacotes; **não há rollback transacional**. Consulte o log e o banco XBPS antes de retomar. Revise os serviços necessários em `/etc/sv` e seus links em `/var/service` antes de habilitar dbus, elogind, NetworkManager e LightDM.
+## Falhas e segurança
 
-Nunca envie logs brutos publicamente sem remover hostnames, endereços MAC, serial e outros dados sensíveis.
+Em caso de falha, o script interrompe as etapas seguintes e registra o erro em `~/.local/state/linux-autosetup/`. Pacotes e links já aplicados **não são revertidos automaticamente**. Antes de reexecutar, examine o log. A execução preserva symlinks existentes e bloqueia links conflitantes. Não executa alterações de kernel nem instala drivers proprietários por detecção automática.
+
+**Ainda não testado em Void real.** Confirme os nomes dos pacotes e compatibilidade da versão instalada. Não publique logs sem remover informações sensíveis.
+
+## Documentação oficial
+- https://docs.voidlinux.org/config/services/index.html
+- https://docs.voidlinux.org/config/network/networkmanager.html
+- https://docs.voidlinux.org/config/graphical-session/xorg.html
+- https://docs.voidlinux.org/config/media/pipewire.html
