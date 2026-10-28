@@ -54,6 +54,7 @@ Consulte [a auditoria de 27/10/2026](docs/desktop-audit.md) para monitores, corr
 
 ## Ajustes de uso diário
 
+- [Neovim para Python, Yazi Nord, Obsidian e Anki](docs/python-e-estudos.md).
 - [Captura, teclado US intl, clipboard e menu de energia](docs/desktop-extras.md).
 - [Polybar com paleta Nord e ícones FontAwesome](docs/polybar-nord.md).
 - [Zram opcional, configurada separadamente do bootstrap](docs/zram.md).
