@@ -5,10 +5,15 @@ default_border pixel 2
 default_floating_border pixel 2
 gaps inner 9
 gaps outer 4
-client.focused #81A1C1 #3B4252 #ECEFF4 #88C0D0 #81A1C1
-client.unfocused #434C5E #2E3440 #D8DEE9 #434C5E #434C5E
+client.focused #88C0D0 #3B4252 #ECEFF4 #88C0D0 #88C0D0
+client.unfocused #434C5E #2E3440 #ECEFF4 #434C5E #434C5E
 bindsym $mod+Return exec alacritty
 bindsym $mod+d exec rofi -show drun
+bindsym --release Print exec bash "/home/glover/setup-voidlinux/scripts/screenshot.sh"
+bindsym $mod+Shift+s exec bash "/home/glover/setup-voidlinux/scripts/screenshot.sh"
+bindsym $mod+Shift+v exec bash "/home/glover/setup-voidlinux/scripts/clipboard-menu.sh"
+bindsym $mod+Shift+p exec bash "/home/glover/setup-voidlinux/scripts/power-menu.sh"
+exec_always --no-startup-id setxkbmap -layout us -variant intl
 bindsym $mod+Shift+q kill
 bindsym $mod+Shift+c reload
 bindsym $mod+Shift+r restart
@@ -36,7 +41,26 @@ bindsym $mod+Shift+2 move container to workspace number 2
 bindsym $mod+Shift+3 move container to workspace number 3
 bindsym $mod+Shift+4 move container to workspace number 4
 bindsym $mod+Shift+5 move container to workspace number 5
-exec --no-startup-id feh --bg-fill /usr/share/backgrounds/nord-solid.png
-exec --no-startup-id dunst
-exec --no-startup-id nm-applet
-exec --no-startup-id sh -c 'pkill -x polybar || true; polybar main'
+bindsym $mod+e exec thunar
+bindsym $mod+Shift+t exec bash "/home/glover/setup-voidlinux/scripts/theme-menu.sh"
+bindsym $mod+Ctrl+l exec i3lock --color=2e3440
+bindsym XF86AudioRaiseVolume exec wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%+
+bindsym XF86AudioLowerVolume exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
+bindsym XF86AudioMute exec wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+bindsym XF86AudioMicMute exec wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle
+bindsym XF86AudioPlay exec playerctl play-pause
+bindsym XF86AudioNext exec playerctl next
+bindsym XF86AudioPrev exec playerctl previous
+bindsym XF86MonBrightnessUp exec brightnessctl set +5%
+bindsym XF86MonBrightnessDown exec brightnessctl set 5%-
+bindsym $mod+r mode "resize"
+mode "resize" {
+ bindsym h resize shrink width 10 px or 10 ppt
+ bindsym j resize grow height 10 px or 10 ppt
+ bindsym k resize shrink height 10 px or 10 ppt
+ bindsym l resize grow width 10 px or 10 ppt
+ bindsym Return mode "default"
+ bindsym Escape mode "default"
+}
+exec --no-startup-id bash "/home/glover/setup-voidlinux/scripts/session-start.sh"
+exec --no-startup-id sh -c 'bash "/home/glover/setup-voidlinux/scripts/monitor-external.sh" --apply; exec bash "/home/glover/setup-voidlinux/scripts/bar-start.sh"'
