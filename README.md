@@ -24,3 +24,18 @@ O script ainda não implementa zram, drivers específicos de hardware, rollback 
 - https://docs.voidlinux.org/config/network/networkmanager.html
 - https://docs.voidlinux.org/config/graphical-session/xorg.html
 - https://docs.voidlinux.org/config/media/pipewire.html
+
+## Temas i3 (Nord padrão)
+
+O instalador usa **Nord** por padrão no perfil i3. Os arquivos de tema gerados cobrem i3, Polybar, Rofi, Dunst e Alacritty. Para trocar o tema **sem reinstalar pacotes**:
+
+```bash
+git pull
+bash scripts/theme.sh nord --plan
+bash scripts/theme.sh nord --apply
+# outras opções:
+bash scripts/theme.sh gruvbox --apply
+bash scripts/theme.sh solarized --apply
+```
+
+O script preserva arquivos de configuração existentes em `~/.local/state/linux-autosetup/theme-backups/` antes de substituir os caminhos; symlinks anteriores são redirecionados. Confira o `--plan` e mantenha backups externos das suas personalizações. O tema é aplicado em arquivos; para ver o resultado no i3, pressione **Super+Shift+C**, reinicie Polybar (`pkill -x polybar; polybar main &`) e reabra Rofi/Alacritty. Dunst pode precisar reiniciar. O tema **não** muda automaticamente GTK, ícones, cursor, wallpaper ou aplicativos externos. O script não faz rollback automático.
