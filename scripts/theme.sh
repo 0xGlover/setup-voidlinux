@@ -80,15 +80,15 @@ primary = $ACCENT
 [bar/main]
 width = 100%
 height = 28
-background = ${colors.background}
-foreground = ${colors.foreground}
+background = \${colors.background}
+foreground = \${colors.foreground}
 font-0 = monospace:size=10;2
 modules-left = i3
 modules-right = cpu memory date
 [module/i3]
 type = internal/i3
 label-focused = %index%
-label-focused-foreground = ${colors.primary}
+label-focused-foreground = \${colors.primary}
 label-focused-padding = 2
 label-unfocused = %index%
 label-unfocused-padding = 2
