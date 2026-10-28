@@ -107,12 +107,30 @@ date = %d/%m %H:%M
 label = %date%
 EOF
 cat > "$state/generated/$theme/rofi/config.rasi" <<EOF
-configuration { modi: "drun,run,window"; show-icons: true; font: "monospace 11"; }
-* { background: $BG; foreground: $FG; }
-window { width: 40%; border: 2px; border-color: $ACCENT; }
-element selected { background-color: $ACCENT; text-color: $BG; }
-listview { lines: 8; }
-element { padding: 8px; }
+configuration {
+    modi: "drun,run,window";
+    show-icons: true;
+    font: "monospace 11";
+}
+* {
+    background: $BG;
+    foreground: $FG;
+}
+window {
+    width: 40%;
+    border: 2px;
+    border-color: $ACCENT;
+}
+element selected {
+    background-color: $ACCENT;
+    text-color: $BG;
+}
+listview {
+    lines: 8;
+}
+element {
+    padding: 8px;
+}
 EOF
 cat > "$state/generated/$theme/dunst/dunstrc" <<EOF
 [global]
