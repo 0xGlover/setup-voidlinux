@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -uo pipefail
+failures=0
+check() {
+    printf '\n> '; printf '%q ' "$@"; printf '\n'
+    "$@" || { failures=$((failures + 1)); return 0; }
+}
+check niri validate
+check loginctl session-status
+check wpctl status
+check pactl info
+check niri msg outputs
+check niri msg version
+check vainfo --display wayland
+check pgrep -a -u "$(id -u)" -x pipewire
+check pgrep -a -u "$(id -u)" -x wireplumber
+check pgrep -a -u "$(id -u)" -x dms
+printf '\nVerificações que falharam: %s\n' "$failures"
+printf 'Teste também som/HDMI, microfone, bloqueio/desbloqueio e compartilhamento de tela.\n'
+(( failures == 0 ))

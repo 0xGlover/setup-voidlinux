@@ -1,0 +1,56 @@
+// Managed initial config. Dux owns the fragments under dms/.
+include "dms/input.kdl"
+layout {
+    gaps 5
+    background-color "transparent"
+    default-column-width { proportion 0.5; }
+    focus-ring { width 2; }
+}
+environment {
+    XDG_CURRENT_DESKTOP "niri"
+    XDG_SESSION_DESKTOP "niri"
+    QT_QPA_PLATFORM "wayland;xcb"
+}
+spawn-at-startup "sh" "-c" "exec \"$HOME/.local/bin/niri-dux-autostart\""
+layer-rule {
+    match namespace="^quickshell$"
+    place-within-backdrop true
+}
+layer-rule {
+    match namespace="dms:blurwallpaper"
+    place-within-backdrop true
+}
+window-rule {
+    match app-id="dev.duxlabs.shell"
+    open-floating true
+}
+binds {
+    Mod+Return { spawn "alacritty"; }
+    Mod+E { spawn "thunar"; }
+    Mod+Q { close-window; }
+    Mod+Tab { toggle-overview; }
+    Mod+Left { focus-column-left; }
+    Mod+Right { focus-column-right; }
+    Mod+Up { focus-window-up; }
+    Mod+Down { focus-window-down; }
+    Mod+Shift+Left { move-column-left; }
+    Mod+Shift+Right { move-column-right; }
+    Mod+Shift+Up { move-window-up; }
+    Mod+Shift+Down { move-window-down; }
+    Mod+Page_Up { focus-workspace-up; }
+    Mod+Page_Down { focus-workspace-down; }
+    Mod+Shift+Page_Up { move-column-to-workspace-up; }
+    Mod+Shift+Page_Down { move-column-to-workspace-down; }
+    Mod+F { maximize-column; }
+    Mod+Shift+F { fullscreen-window; }
+    Mod+R { switch-preset-column-width; }
+    Mod+Shift+Space { toggle-window-floating; }
+    Mod+Shift+E { quit; }
+    Print { screenshot; }
+}
+include "dms/colors.kdl"
+include "dms/layout.kdl"
+include "dms/alttab.kdl"
+include "dms/binds.kdl"
+include "dms/outputs.kdl"
+include "dms/cursor.kdl"

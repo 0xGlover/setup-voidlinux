@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+[[ $EUID != 0 ]] || { echo 'Entre com seu usuário comum.' >&2; exit 1; }
+[[ -z ${DISPLAY:-} && -z ${WAYLAND_DISPLAY:-} ]] || { echo 'Inicie a partir de um TTY, fora de outra sessão gráfica.' >&2; exit 1; }
+[[ -n ${XDG_RUNTIME_DIR:-} && -d $XDG_RUNTIME_DIR && ! -L $XDG_RUNTIME_DIR ]] || {
+    echo 'XDG_RUNTIME_DIR ausente. Reinicie e entre novamente pelo TTY; confira dbus, elogind e PAM.' >&2; exit 1;
+}
+[[ $(stat -c %u "$XDG_RUNTIME_DIR") == "$(id -u)" && $(stat -c %a "$XDG_RUNTIME_DIR") == 700 ]] || {
+    echo 'Proprietário/permissões inválidos em XDG_RUNTIME_DIR.' >&2; exit 1;
+}
+export XDG_CURRENT_DESKTOP=niri XDG_SESSION_DESKTOP=niri XDG_SESSION_TYPE=wayland
+export LIBSEAT_BACKEND=logind
+export PATH="$HOME/.local/bin:$PATH"
+niri validate
+mkdir -p "${XDG_STATE_HOME:-$HOME/.local/state}/niri-dux"
+# A dedicated bus binds D-Bus activated portals to this session.
+exec dbus-run-session -- niri --session >>"${XDG_STATE_HOME:-$HOME/.local/state}/niri-dux/session.log" 2>&1

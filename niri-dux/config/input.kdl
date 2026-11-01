@@ -1,0 +1,4 @@
+input {
+    keyboard { xkb { layout "@KEYBOARD@"; }; }
+    touchpad { tap; natural-scroll; dwt; }
+}

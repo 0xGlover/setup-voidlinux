@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+state=${XDG_STATE_HOME:-$HOME/.local/state}/niri-dux
+mkdir -p "$state"
+exec >>"$state/autostart.log" 2>&1
+[[ -n ${NIRI_SOCKET:-} && -S $NIRI_SOCKET ]] || { echo 'Socket Niri ausente.'; exit 1; }
+# Prevent duplicate autostarts within the same session.
+exec 9>"$XDG_RUNTIME_DIR/niri-dux-autostart.lock"
+flock -n 9 || exit 0
+children=()
+cleanup() {
+    trap - EXIT TERM INT
+    if (( ${#children[@]} )); then
+        kill "${children[@]}" 2>/dev/null || true
+        wait "${children[@]}" 2>/dev/null || true
+    fi
+}
+trap cleanup EXIT
+trap 'exit 0' TERM INT
+# Export compositor-assigned variables before any portal is activated.
+dbus-update-activation-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_DESKTOP XDG_SESSION_TYPE PATH
+if ! pgrep -u "$(id -u)" -x pipewire >/dev/null; then
+    pipewire &
+    children+=("$!")
+fi
+# The pipewire snippets launch WirePlumber and pipewire-pulse. DMS supplies
+# notifications, polkit, clipboard, wallpaper, locking and idle management.
+dms run &
+dms_pid=$!
+children+=("$dms_pid")
+# Niri's exit closes its IPC socket. Reap only processes started here, so
+# returning to TTY does not leave an audio daemon attached to a dead bus.
+owner=$$
+(
+    while [[ -S $NIRI_SOCKET ]] && niri msg version >/dev/null 2>&1; do sleep 1; done
+    kill -TERM "$owner"
+) &
+children+=("$!")
+wait "$dms_pid"
