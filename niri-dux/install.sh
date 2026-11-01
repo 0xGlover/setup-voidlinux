@@ -101,7 +101,11 @@ done
 [[ -t 0 && -z ${SSH_CONNECTION:-} && -z ${DISPLAY:-} && -z ${WAYLAND_DISPLAY:-} ]] || die 'Aplique em TTY local, fora de SSH e da sessão gráfica.'
 (( ! GPU_NVIDIA || ALLOW_NOUVEAU )) || die 'NVIDIA exige escolha explícita; consulte README.md.'
 command -v sudo >/dev/null || die 'Instale sudo e autorize seu usuário primeiro (README.md).'
-for service in seatd acpid turnstiled lightdm gdm sddm greetd; do
+# acpid is common on stock Void; its presence alone does not prove a conflict.
+if [[ -e /var/service/acpid || -L /var/service/acpid ]]; then
+    note 'acpid habilitado: preservado. Revise possíveis eventos ACPI duplicados após iniciar elogind.'
+fi
+for service in seatd turnstiled lightdm gdm sddm greetd; do
     [[ ! -e /var/service/$service && ! -L /var/service/$service ]] || die "Serviço conflitante: $service. Use uma instalação limpa ou revise manualmente."
 done
 if [[ ! -f $STATE/managed ]]; then
