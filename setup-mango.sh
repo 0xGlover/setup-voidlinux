@@ -28,14 +28,14 @@ log_ok()   { echo -e "${GREEN}[OK]${NC} $1"; }
 log_warn() { echo -e "${YELLOW}[AVISO]${NC} $1"; }
 log_err()  { echo -e "${RED}[ERRO]${NC} $1" >&2; }
 
-# Função para instalar pacotes de forma resiliente (Error Handling)
+# Função para instalar pacotes de forma resiliente (Idempotência e Error Handling)
 instalar_pacotes() {
     for pacote in "$@"; do
         if xbps-query -e "$pacote" >/dev/null 2>&1; then
             log_info "O pacote '$pacote' já está instalado. Seguindo em frente..."
         else
             log_info "Instalando '$pacote'..."
-            sudo xbps-install -y "$pacote" || log_warn "Falha ao instalar '$pacote'. Verifique o nome."
+            sudo xbps-install -y "$pacote" || log_warn "Falha ao instalar '$pacote'. Verifique o nome no repositório."
         fi
     done
 }
@@ -142,7 +142,9 @@ instalar_pacotes \
     eudev-libudev-devel \
     gdk-pixbuf-devel \
     libxkbcommon-devel \
-    cJSON-devel
+    cJSON-devel \
+    libxml2-devel \
+    cmake
 
 BUILD_DIR=$(mktemp -d /tmp/mangobar-build.XXXXXX)
 log_info "Clonando repositório oficial do MangoBar em ${BUILD_DIR}..."
