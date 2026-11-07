@@ -28,6 +28,18 @@ log_ok()   { echo -e "${GREEN}[OK]${NC} $1"; }
 log_warn() { echo -e "${YELLOW}[AVISO]${NC} $1"; }
 log_err()  { echo -e "${RED}[ERRO]${NC} $1" >&2; }
 
+# Função para instalar pacotes de forma resiliente (Error Handling)
+instalar_pacotes() {
+    for pacote in "$@"; do
+        if xbps-query -e "$pacote" >/dev/null 2>&1; then
+            log_info "O pacote '$pacote' já está instalado. Seguindo em frente..."
+        else
+            log_info "Instalando '$pacote'..."
+            sudo xbps-install -y "$pacote" || log_warn "Falha ao instalar '$pacote'. Verifique o nome."
+        fi
+    done
+}
+
 # Verificação de segurança: não rodar diretamente como root
 if [[ $EUID -eq 0 ]]; then
     log_err "Não execute este script como root! Execute como seu usuário comum (ele solicitará sudo quando necessário)."
@@ -41,14 +53,14 @@ log_info "Iniciando provisionamento do Mango Desktop para o usuário: ${CURRENT_
 # 1. Habilitar repositório nonfree e sincronizar base
 # ------------------------------------------------------------------------------
 log_info "1/7 Habilitando void-repo-nonfree e atualizando o sistema..."
-sudo xbps-install -Sy void-repo-nonfree
+instalar_pacotes void-repo-nonfree
 sudo xbps-install -Syu
 
 # ------------------------------------------------------------------------------
 # 2. Drivers de Hardware da Máquina (Vídeo Intel Sandy Bridge + Energia)
 # ------------------------------------------------------------------------------
 log_info "2/7 Instalando drivers gráficos Intel e utilitários de hardware..."
-sudo xbps-install -y \
+instalar_pacotes \
     intel-ucode \
     mesa-dri \
     libva-intel-driver \
@@ -59,7 +71,7 @@ sudo xbps-install -y \
 # 3. Áudio (PipeWire), Bluetooth e Rede
 # ------------------------------------------------------------------------------
 log_info "3/7 Instalando suporte a áudio PipeWire, Bluetooth e NetworkManager..."
-sudo xbps-install -y \
+instalar_pacotes \
     pipewire \
     wireplumber \
     alsa-pipewire \
@@ -72,11 +84,11 @@ sudo xbps-install -y \
 # 4. Base do Wayland, Sessão, Terminal, Launcher e Fontes
 # ------------------------------------------------------------------------------
 log_info "4/7 Instalando base Wayland (dbus, elogind, polkit), Alacritty, Fuzzel e fontes..."
-sudo xbps-install -y \
+instalar_pacotes \
     dbus \
     elogind \
     polkit \
-    udev \
+    eudev \
     xorg-server-xwayland \
     alacritty \
     fuzzel \
@@ -105,13 +117,13 @@ done
 # 5. Instalação do MangoWC
 # ------------------------------------------------------------------------------
 log_info "5/7 Instalando o MangoWC (pacote oficial do Void Linux)..."
-sudo xbps-install -y mangowc
+instalar_pacotes mangowc
 
 # ------------------------------------------------------------------------------
 # 6. Compilação e Instalação do MangoBar
 # ------------------------------------------------------------------------------
 log_info "6/7 Instalando dependências de build e compilando o MangoBar..."
-sudo xbps-install -y \
+instalar_pacotes \
     meson \
     ninja \
     pkg-config \
